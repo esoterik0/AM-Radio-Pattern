@@ -122,15 +122,19 @@ namespace AMPattern
             sOrient.DataContext = this;
         }
 
+        // do the math for each antennas contribution in that direction
         public Point GetCart(double deg)
         {
-            double ang = deg * (Math.PI / 180.0);
+            // convert to radians or the math won't work
+            double ang = deg * (Math.PI / 180.0); 
             double rPhase = phase * (Math.PI / 180.0);
             double rSpace = spacing * (Math.PI / 180.0);
             double rOrient = orient * (Math.PI / 180.0);
 
+            // antenna contribution for angle
             double beta = rPhase + rSpace*Math.Cos(rOrient - ang);
 
+            // return total contribution
             return new Point(ratio*Math.Cos(beta), ratio*Math.Sin(beta));
         }
         
@@ -139,82 +143,5 @@ namespace AMPattern
             if (changed != null)
                 changed();
         }
-
-        /*
-        private void TextChanged(object sender, RoutedEventArgs e)
-        {
-            NewText(sender);
-        }
-
-        private void TextKeyDown(object sender, KeyEventArgs e)
-        {
-            if(e.Key == Key.Return)
-                NewText(sender);
-        }
-
-        private void NewText(object sender)
-        {
-            double value;
-            if (!Double.TryParse(((TextBox)sender).Text, out value))
-                return;
-
-            if (sender.Equals(tRatio))
-            {
-                ratio = value;
-                sRatio.Value = value;
-            }
-
-            if (sender.Equals(tPhase))
-            {
-                phase = value;
-                sPhase.Value = value;
-            }
-
-            if (sender.Equals(tSpace))
-            {
-                spacing = value;
-                sSpace.Value = value;
-            }
-
-            if (sender.Equals(tOrient))
-            {
-                orient = value;
-                sOrient.Value = value;
-            }
-
-            //CallChanged();
-        }
-
-        private void NewSlider(object sender, RoutedEventArgs e)
-        {
-            double value = ((Slider) sender).Value;
-
-            if (sender.Equals(sRatio))
-            {
-                ratio = value;
-                tRatio.Text = String.Format("{0:0.000}", value);
-            }
-
-            if (sender.Equals(sPhase))
-            {
-                phase = value;
-                tPhase.Text = String.Format("{0:0.0}", value);
-            }
-
-            if (sender.Equals(sSpace))
-            {
-                spacing = value;
-                tSpace.Text = String.Format("{0:0}", value);
-            }
-
-            if (sender.Equals(sOrient))
-            {
-                orient = value;
-                tOrient.Text = String.Format("{0:0}", value);
-            }
-
-            CallChanged();
-        }
-        */
     }
 }

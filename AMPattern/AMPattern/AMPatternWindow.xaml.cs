@@ -20,8 +20,10 @@ namespace AMPattern
     /// </summary>
     public partial class AMPatternWindow : Window
     {
-        private GeometryDrawing bkDrawing;
-        private ColorSelector colors = new ColorSelector();
+        private GeometryDrawing bkDrawing; // background drawing to display 'scope' and pattern
+        private ColorSelector colors = new ColorSelector(); // gives the resistor colors for towers
+
+        // drawing prameters
         private double strokeThickness = .005;
         private double towerRadius = .025;
         
@@ -29,62 +31,73 @@ namespace AMPattern
         {
             InitializeComponent();
 
+            // fix up the mismatch between math N = 90°  and map N = 0°
             TransformGroup xGroup = new TransformGroup();
-            xGroup.Children.Add(new RotateTransform(-90));
-            //xGroup.Children.Add(new ScaleTransform(-1, 1));
+            xGroup.Children.Add(new RotateTransform(-90));  
             pattern.LayoutTransform = xGroup;
 
-            InitBackground(12);
+            InitBackground(12, 10); // 12 divisions
             
-            AddTower();
+            // Populate with the example from the boox
+            AddTower(); // referene Tower
             AddTower(new Tower { phase = 106, spacing = 90, orient = 315 });
             AddTower(new Tower { phase = 90, spacing = 180, orient = 45 });
             AddTower(new Tower { phase = 196, spacing = 201, orient = 18 });
-            TowerChanged();
+            
+            TowerChanged(); // redraw pattern
         }
 
-        private void InitBackground(int radials)
+        private void InitBackground(int radials, int rings = 10)
         {
             var path = new PathFigureCollection();
 
-            for (int i = 1; i <= 10; i++)
-            {
-                double[] mag = Enumerable.Range(0, 60).Select(m => i/10.0).ToArray();
-                path.Add(ComputePath(mag));
+            // make rings concentric rings from 0..1
+            for (int i = 1; i <= rings; i++)
+            {                
+                path.Add(ComputePath(
+                    Enumerable.Range(0, 60).Select(m => i / 10.0).ToArray() // array will have the value in each spot.
+                ));
             }
 
+            // make radials spokes
             PathSegmentCollection radial = new PathSegmentCollection();
             Point zero = new Point(0,0);
             
             for (int i = 0; i < 360; i+=(360/radials))
             {
                 double rad = (Math.PI/180)*i;
-                radial.Add(new LineSegment(new Point(Math.Cos(rad), Math.Sin(rad)), true));
-                radial.Add(new LineSegment(zero, false ));
+                radial.Add(new LineSegment(
+                    new Point(Math.Cos(rad), Math.Sin(rad)), 
+                    true
+                ));
+                radial.Add(new LineSegment(zero, false)); // we don't stroke moving to zero
             }
 
-            path.Add(new PathFigure(zero, radial, false ));
+            path.Add(new PathFigure(zero, radial, false )); // open path figure
 
-            bkDrawing = new GeometryDrawing
-                            {
-                                Geometry = new PathGeometry(path),
-                                Pen = new Pen(Brushes.Gray, strokeThickness),
-                                Brush = Brushes.LightGray
-                            };
+            bkDrawing = new GeometryDrawing {
+                Geometry = new PathGeometry(path),
+                Pen = new Pen(Brushes.Gray, strokeThickness),
+                Brush = Brushes.LightGray
+            };
         }
 
         private void SetPattern(double[] input)
         {
-            var geo = new GeometryDrawing
-                      {
-                          Geometry = new PathGeometry(new PathFigureCollection {ComputePath(input)}),
-                          Pen = new Pen(Brushes.Black, strokeThickness),
-                          Brush = new SolidColorBrush(Colors.LightBlue) {Opacity = 0.5}
-                      };
+            var geo = new GeometryDrawing {
+                Geometry = new PathGeometry(
+                    new PathFigureCollection {ComputePath(input)}
+                ),
+                Pen = new Pen(Brushes.Black, strokeThickness),
+                Brush = new SolidColorBrush(Colors.LightBlue) {Opacity = 0.5}
+            };
 
-            var grp = new DrawingGroup();
-            grp.Children.Add(bkDrawing);
-            grp.Children.Add(geo);
+            var grp = new DrawingGroup {
+                Children = {
+                    bkDrawing,
+                    geo
+                }
+            };
 
             if(ShowTowers.IsChecked == true)
                 grp.Children.Add(DrawTowers());
@@ -92,21 +105,31 @@ namespace AMPattern
             pattern.Source = new DrawingImage(grp);
         }
 
+        // TODO:: make the towers Ui objects that can be click and dragged, mousewheel ~ phase (modifier orientation)
+        // TODO:: make the towers show phase and possibly orientation
+        // return a DrawingGroup of the towers; 
         private Drawing DrawTowers()
         {
-            Func<Tower, Point> map = t =>
-                                     {
-                                         double mag = t.spacing/360.0;
-                                         double rad = t.orient*(Math.PI/180.0);
-                                         return new Point(mag*Math.Cos(rad), mag*Math.Sin(rad));
-                                     };
+            Func<Tower, Point> map = t => {
+                double mag = t.spacing/360.0;  // TODO:: DRY arbitrary HARDCODE::
+                double rad = t.orient*(Math.PI/180.0); // should pi/180 become its own constant? TOOO::?
+                return new Point(mag*Math.Cos(rad), mag*Math.Sin(rad));
+            };
 
             var pen = new Pen(Brushes.Black, strokeThickness);
             var dg = new DrawingGroup
-                     {
-                         Children = new DrawingCollection(aStack.Children.Cast<Tower>().Select(map) // maps towers to points
-                                    .Select((p, i) => new GeometryDrawing(colors.GetColor(i), pen, new EllipseGeometry(p, towerRadius, towerRadius)))) // maps points to geometry
-                     };
+            {
+                Children = new DrawingCollection(
+                    aStack.Children.Cast<Tower>().Select(map) // maps towers to points
+                    .Select(
+                        (p, i) => new GeometryDrawing(
+                            colors.GetColor(i), 
+                            pen, 
+                            new EllipseGeometry(p, towerRadius, towerRadius)
+                        )
+                    )
+                ) // maps points to geometry
+            };
 
             return dg;
         }
@@ -123,17 +146,27 @@ namespace AMPattern
             double radStep = 2.0*Math.PI/mag.Length;
             
             // project our vectors into points; 
-            Point[] points = mag.Select((m, r) => new Point(m*Math.Cos(r*radStep), m*Math.Sin(r*radStep))).ToArray();
+            Point[] points = mag.Select(
+                (m, r) => new Point(m*Math.Cos(r*radStep), m*Math.Sin(r*radStep))
+            ).ToArray();
 
             // create and return our path figure
-            return new PathFigure(points[0], new PathSegmentCollection(points.Skip(1).Select(p => new LineSegment(p, true))), true);
+            return new PathFigure(
+                points[0], // start point
+                new PathSegmentCollection(
+                    points.Skip(1).Select( // skip start point
+                        p => new LineSegment(p, true) // stroke them all
+                    ) 
+                ),
+                true // closed figure
+            );
         }
 
         private void Clear(object sender, RoutedEventArgs e)
         {
             aStack.Children.Clear();
-            AddTower();
-            TowerChanged();
+            AddTower(); // always have at least one tower; reset to the reference tower.
+            TowerChanged(); // redraw pattern
         }
 
         private void AddTower()
@@ -149,9 +182,10 @@ namespace AMPattern
             aStack.Children.Add(t);
         }
 
+        // redraw pattern
         private void TowerChanged()
         {
-            int slices = 400; 
+            int slices = 400; // gradiens
 
             double[] magn = new double[slices];
             
@@ -180,7 +214,7 @@ namespace AMPattern
 
         private void ToggleTowers(object sender, RoutedEventArgs e)
         {
-            TowerChanged();
+            TowerChanged(); // redraw pattern
         }
     }
 }
