@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="AMPattern.Tower"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             >
+    <Border BorderThickness="2" BorderBrush="Black" >
+        <Grid Background="White">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+        
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+        
+            <Label Content="Ratio" Grid.Column="0" Grid.Row="0" />
+            <TextBox Name="tRatio" Text="1.000" Grid.Column="1" Grid.Row="0" />
+            <Slider Name="sRatio" Background="{Binding Background}" Grid.Column="2" Grid.Row="0" Width="150" Minimum="0.0" Maximum="1.000" Value="1.000" />
+
+            <Label Content="Phase" Grid.Column="0" Grid.Row="1" />
+            <TextBox Name="tPhase" Text="0" Grid.Column="1" Grid.Row="1" />
+            <Slider Name="sPhase" Background="{Binding Background}" Grid.Column="2" Grid.Row="1" Width="150" Minimum="-360" Maximum="360" Value="0" />
+
+            <Label Content="Spacing" Grid.Column="0" Grid.Row="2" />
+            <TextBox Name="tSpace" Text="0" Grid.Column="1" Grid.Row="2"/>
+            <Slider Name="sSpace" Background="{Binding Background}" Grid.Column="2" Grid.Row="2" Width="150" Minimum="-360" Maximum="360" Value="0" />
+
+            <Label Content="Orient" Grid.Column="0" Grid.Row="3" />
+            <TextBox Name="tOrient" Text="0" Grid.Column="1" Grid.Row="3" />
+            <Slider Name="sOrient" Background="{Binding Background}" Grid.Column="2" Grid.Row="3" Width="150" Minimum="-360" Maximum="360" Value="0" />
+        </Grid>
+    </Border>
+</UserControl>

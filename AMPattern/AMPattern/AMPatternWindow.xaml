@@ -1,0 +1,31 @@
+﻿<Window x:Class="AMPattern.AMPatternWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="AM Pattern" Icon="ico.png" Height="600" Width="800"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" mc:Ignorable="d" d:DataContext="{Binding RelativeSource={RelativeSource self} }">
+    <DockPanel >
+        <DockPanel Background="Gray" DockPanel.Dock="Left">
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" >
+                <Button Content="New Tower" Click="NewTower" />
+                <Button Content="Clear Towers" Click="Clear" />
+                <ToggleButton Content="Show Towers" IsChecked="True" Name="ShowTowers" Click="ToggleTowers"/>
+            </StackPanel>
+
+            <ScrollViewer DockPanel.Dock="Top" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel Name="aStack"  Orientation="Vertical" />
+            </ScrollViewer>
+        </DockPanel>
+        <Border BorderBrush="Black" BorderThickness="2" DockPanel.Dock="Right">
+            <Grid Background="White" Margin="4" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Grid.Row="0" Stretch="Uniform" Name="pattern" />
+            </Grid>
+        </Border>
+    </DockPanel>
+</Window>
