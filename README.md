@@ -5,7 +5,7 @@ Initially written in a few hours as a test to see if I could learn the new UI ap
 
 # What it is; how it works
 
-An array of antennas broadcasting AM Radio, can be configured to change its antenna pattern. Each antenna has four parameters: ratio, orientation, spacing, and phase. ratio is 0..1, and all other are in degreess from -360..360
+An array of antennas broadcasting AM Radio, can be configured to change its antenna pattern. Each antenna has four parameters: ratio, orientation, spacing, and phase. ratio is 0..1, and all other are in degreess from -360..360.
 Ratio, and phase can be changed after the array is built. The number, spacing and orientation cannot be easilly changed after the array is built.
 
 Upon start up the default problem from the text book is entered; this was a quick test to ensure the math was correct.
